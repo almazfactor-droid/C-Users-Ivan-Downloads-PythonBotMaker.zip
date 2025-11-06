@@ -18,6 +18,14 @@ if not TOKEN or not CHANNEL:
     raise RuntimeError("Нет TELEGRAM_BOT_TOKEN или TELEGRAM_CHANNEL_ID")
 
 bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
+# сразу проверим токен
+try:
+    me = bot.get_me()
+    logging.info(f"Bot OK: @{me.username} (id={me.id})")
+except Exception as e:
+    logging.exception("❌ Токен невалиден — проверь TELEGRAM_BOT_TOKEN (без пробелов/кавычек).")
+    raise
+
 bot.delete_webhook(drop_pending_updates=True)
 
 # ----- Генерация текста -----

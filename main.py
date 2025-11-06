@@ -68,16 +68,25 @@ def on_now(m):
 
 # ===== Запуск планировщика + polling =====
 if __name__ == "__main__":
+    # Сбрасываем активный вебхук, чтобы polling не конфликтовал
+    try:
+        # удаляем вебхук и отбрасываем накопившиеся апдейты
+        bot.delete_webhook(drop_pending_updates=True)
+        # или так (в некоторых версиях): bot.remove_webhook()
+        logging.info("Webhook удалён, запускаю планировщик и polling.")
+    except Exception as e:
+        logging.exception(f"Не удалось удалить webhook: {e}")
+
+    # Планировщик (08:00 и 14:00 МСК)
     sched = BackgroundScheduler(timezone=ZoneInfo("Europe/Moscow"))
-    # Утренний пост
     sched.add_job(send_post, CronTrigger(hour=8, minute=0), args=["morning"])
-    # Дневной пост
     sched.add_job(send_post, CronTrigger(hour=14, minute=0), args=["day"])
     sched.start()
     logging.info("Бот запущен. План: 08:00 и 14:00 (МСК). Команда /now активна.")
 
-    # Запускаем приём команд
+    # Приём команд
     try:
         bot.infinity_polling(timeout=60, long_polling_timeout=60)
     except KeyboardInterrupt:
         logging.info("Остановка.")
+

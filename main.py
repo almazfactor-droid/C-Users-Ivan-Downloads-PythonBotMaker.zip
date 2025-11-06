@@ -18,6 +18,7 @@ if not TOKEN or not CHANNEL:
     raise RuntimeError("Нет TELEGRAM_BOT_TOKEN или TELEGRAM_CHANNEL_ID")
 
 bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
+bot.delete_webhook(drop_pending_updates=True)
 
 # ----- Генерация текста -----
 def build_post(time_label: str) -> str:
